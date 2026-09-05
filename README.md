@@ -25,9 +25,9 @@ Open the local URL Vite prints (usually `http://localhost:5173`).
 
 ## Demo student
 
-- Email: `jude.hewitt@demo.edu`
+- Email: `alexander.caldwell@demo.edu`
 - Password: `Recruit2028!`
-- Or click **Enter as Jude Hewitt**
+- Or click **Enter as Alexander Caldwell**
 
 ## Student screens
 

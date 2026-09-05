@@ -1,9 +1,6 @@
-import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined'
 import CheckCircle from '@mui/icons-material/CheckCircle'
-import FactCheckOutlined from '@mui/icons-material/FactCheckOutlined'
 import HourglassEmpty from '@mui/icons-material/HourglassEmpty'
 import RadioButtonUnchecked from '@mui/icons-material/RadioButtonUnchecked'
-import VideocamOutlined from '@mui/icons-material/VideocamOutlined'
 import {
   Box,
   Card,
@@ -21,15 +18,21 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import PageHeader from '../../components/PageHeader'
 import { mockTrainingTopics } from '../../mock/data'
+import { trainingVideoById } from '../../mock/trainingVideos'
 import type { TrainingStatus, TrainingTopic } from '../../types'
 
-const featuredIcons = [
-  <VideocamOutlined key="video" />,
-  <FactCheckOutlined key="check" />,
-  <CalendarMonthOutlined key="cal" />,
+const FILTER_TILES: {
+  id: TrainingStatus | 'All'
+  label: string
+  bgcolor: string
+  color: string
+  icon: typeof CheckCircle | typeof HourglassEmpty | typeof RadioButtonUnchecked | null
+}[] = [
+  { id: 'All', label: 'All', bgcolor: '#222A5B', color: '#ffffff', icon: null },
+  { id: 'Complete', label: 'Complete', bgcolor: '#1B7A4E', color: '#ffffff', icon: CheckCircle },
+  { id: 'In Progress', label: 'In Progress', bgcolor: '#C47B17', color: '#ffffff', icon: HourglassEmpty },
+  { id: 'Not Started', label: 'Not Started', bgcolor: '#E6EEFF', color: '#222A5B', icon: RadioButtonUnchecked },
 ]
-
-const STATUS_ORDER: TrainingStatus[] = ['Complete', 'In Progress', 'Not Started']
 
 const STATUS_STYLE: Record<
   TrainingStatus,
@@ -40,12 +43,11 @@ const STATUS_STYLE: Record<
   'Not Started': { bgcolor: '#E6EEFF', color: '#222A5B', icon: RadioButtonUnchecked },
 }
 
-function StatusChip({ status, size = 'small' }: { status: TrainingStatus; size?: 'small' | 'medium' }) {
+function StatusChip({ status }: { status: TrainingStatus }) {
   const style = STATUS_STYLE[status]
   const Icon = style.icon
   return (
     <Chip
-      size={size}
       icon={<Icon sx={{ color: `${style.color} !important`, fontSize: 16 }} />}
       label={status}
       sx={{ bgcolor: style.bgcolor, color: style.color, fontWeight: 700 }}
@@ -68,13 +70,13 @@ export default function TrainingLibraryPage() {
       setActiveId(requestedTopic)
     }
   }, [requestedTopic])
-  const featured = mockTrainingTopics.filter((topic) => topic.featured).slice(0, 3)
   const active = mockTrainingTopics.find((topic) => topic.id === activeId) ?? mockTrainingTopics[0]
+  const video = trainingVideoById[active.id]
 
   const counts = useMemo(() => {
-    return STATUS_ORDER.reduce(
-      (acc, status) => {
-        acc[status] = mockTrainingTopics.filter((topic) => topic.status === status).length
+    return mockTrainingTopics.reduce(
+      (acc, topic) => {
+        acc[topic.status] += 1
         return acc
       },
       { Complete: 0, 'In Progress': 0, 'Not Started': 0 } as Record<TrainingStatus, number>,
@@ -92,63 +94,41 @@ export default function TrainingLibraryPage() {
         subtitle="Each module is marked Complete, In Progress, or Not Started so you can see what still needs attention."
       />
 
-      <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
-        <Chip
-          label={`All · ${mockTrainingTopics.length}`}
-          onClick={() => setStatusFilter('All')}
-          variant={statusFilter === 'All' ? 'filled' : 'outlined'}
-          color="primary"
-        />
-        {STATUS_ORDER.map((status) => (
-          <Chip
-            key={status}
-            label={`${status} · ${counts[status]}`}
-            onClick={() => setStatusFilter(status)}
-            variant={statusFilter === status ? 'filled' : 'outlined'}
-            sx={
-              statusFilter === status
-                ? { bgcolor: STATUS_STYLE[status].bgcolor, color: STATUS_STYLE[status].color }
-                : undefined
-            }
-          />
-        ))}
-      </Stack>
-
-      <Grid container spacing={2}>
-        {featured.map((topic, index) => (
-          <Grid key={topic.id} size={{ xs: 12, md: 4 }}>
-            <Card>
-              <CardActionArea onClick={() => setActiveId(topic.id)} sx={{ p: 1 }}>
-                <CardContent sx={{ textAlign: 'center' }}>
-                  <Box
-                    sx={{
-                      width: 72,
-                      height: 72,
-                      mx: 'auto',
-                      mb: 1.5,
-                      borderRadius: '50%',
-                      bgcolor: index === 0 ? 'secondary.main' : 'primary.main',
-                      color: 'white',
-                      display: 'grid',
-                      placeItems: 'center',
-                    }}
-                  >
-                    {featuredIcons[index]}
-                  </Box>
-                  <Typography variant="subtitle1">{topic.title}</Typography>
-                  {topic.duration ? (
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                      {topic.duration}
+      <Grid container spacing={1.5}>
+        {FILTER_TILES.map((tile) => {
+          const count = tile.id === 'All' ? mockTrainingTopics.length : counts[tile.id]
+          const selected = statusFilter === tile.id
+          const Icon = tile.icon
+          return (
+            <Grid key={tile.id} size={{ xs: 6, sm: 3 }}>
+              <Card
+                sx={{
+                  height: '100%',
+                  bgcolor: tile.bgcolor,
+                  color: tile.color,
+                  border: selected ? '2px solid #A52828' : '2px solid transparent',
+                  boxShadow: selected ? '0 8px 20px rgba(34, 42, 91, 0.18)' : 'none',
+                  opacity: selected ? 1 : 0.78,
+                }}
+              >
+                <CardActionArea
+                  onClick={() => setStatusFilter(tile.id)}
+                  sx={{ height: '100%', py: 1.5, px: 1.5 }}
+                >
+                  <Stack spacing={0.5} sx={{ alignItems: 'center' }}>
+                    {Icon ? <Icon sx={{ fontSize: 20, color: tile.color }} /> : null}
+                    <Typography variant="body2" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                      {tile.label}
                     </Typography>
-                  ) : (
-                    <Box sx={{ mb: 1 }} />
-                  )}
-                  <StatusChip status={topic.status} />
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          </Grid>
-        ))}
+                    <Typography variant="h5" sx={{ fontWeight: 800, lineHeight: 1 }}>
+                      {count}
+                    </Typography>
+                  </Stack>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          )
+        })}
       </Grid>
 
       <Grid container spacing={2}>
@@ -172,10 +152,10 @@ export default function TrainingLibraryPage() {
           </Card>
         </Grid>
         <Grid size={{ xs: 12, md: 8 }}>
-          <Card sx={{ minHeight: 280 }}>
+          <Card>
             <CardContent>
               <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', mb: 1.5 }}>
-                <Chip label={active.category} color="primary" size="small" />
+                <Chip label={active.category} color="primary" />
                 <StatusChip status={active.status} />
               </Stack>
               <Typography variant="h5" sx={{ mb: 1 }}>
@@ -184,10 +164,51 @@ export default function TrainingLibraryPage() {
               <Typography color="text.secondary" sx={{ mb: 2 }}>
                 {active.description}
               </Typography>
-              <Typography variant="body2">
-                This is a mock training article. In a later phase these items will open videos,
-                checklists, and official NCAA / NAIA / NJCAA resources.
-              </Typography>
+              {video ? (
+                <>
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      width: '100%',
+                      pt: '56.25%',
+                      borderRadius: 1,
+                      overflow: 'hidden',
+                      bgcolor: '#111',
+                      mb: 1,
+                    }}
+                  >
+                    <Box
+                      component="iframe"
+                      src={`https://www.youtube.com/embed/${video.videoId}`}
+                      title={active.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      sx={{
+                        position: 'absolute',
+                        inset: 0,
+                        border: 0,
+                        width: '100%',
+                        height: '100%',
+                      }}
+                    />
+                  </Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                    Demo clip matched to this topic. Not official NCAA coursework.
+                  </Typography>
+                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                    Mock summary
+                  </Typography>
+                  <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
+                    {video.takeaways.map((line) => (
+                      <Typography key={line} component="li" variant="body2" sx={{ mb: 0.75 }}>
+                        {line}
+                      </Typography>
+                    ))}
+                  </Box>
+                </>
+              ) : (
+                <Typography variant="body2">No demo video is mapped to this topic yet.</Typography>
+              )}
             </CardContent>
           </Card>
         </Grid>
@@ -218,11 +239,7 @@ function TopicListItem({
         },
       }}
     >
-      <ListItemText
-        primary={topic.title}
-        secondary={topic.category}
-        sx={{ mr: 1 }}
-      />
+      <ListItemText primary={topic.title} secondary={topic.category} sx={{ mr: 1 }} />
       <StatusChip status={topic.status} />
     </ListItemButton>
   )

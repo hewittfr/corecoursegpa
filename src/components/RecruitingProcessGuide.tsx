@@ -1,15 +1,18 @@
 import CheckCircle from '@mui/icons-material/CheckCircle'
 import ChevronRight from '@mui/icons-material/ChevronRight'
+import ErrorOutline from '@mui/icons-material/ErrorOutlineOutlined'
 import InfoOutlined from '@mui/icons-material/InfoOutlined'
-import RadioButtonUnchecked from '@mui/icons-material/RadioButtonUnchecked'
+import PlayArrow from '@mui/icons-material/PlayArrow'
+import Replay from '@mui/icons-material/Replay'
+import WarningAmber from '@mui/icons-material/WarningAmber'
 import {
   Box,
   Button,
   Card,
   CardContent,
   Chip,
+  IconButton,
   LinearProgress,
-  Link,
   Stack,
   Tooltip,
   Typography,
@@ -174,6 +177,19 @@ function StepCard({
             {step.goal}
           </Typography>
         </Box>
+        {step.completed > 0 ? (
+          <Tooltip title={`Review ${step.title.toLowerCase()}`}>
+            <IconButton
+              component={RouterLink}
+              to={step.reviewTo}
+              size="small"
+              aria-label={`Review ${step.title}`}
+              sx={{ mt: -0.5, mr: -0.75 }}
+            >
+              <Replay fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        ) : null}
       </Stack>
 
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.75 }}>
@@ -200,99 +216,82 @@ function StepCard({
         </Typography>
       ) : null}
 
-      <Stack spacing={0.75} sx={{ flex: 1, mb: 1.5 }}>
+      <Stack spacing={0.75} sx={{ flex: 1 }}>
         {step.tasks.map((task) => (
           <TaskRow key={task.id} task={task} isNext={step.nextTask?.id === task.id} />
         ))}
       </Stack>
-
-      {step.resources.length > 0 ? (
-        <Box sx={{ mb: 1.5 }}>
-          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, display: 'block', mb: 0.5 }}>
-            Also open
-          </Typography>
-          <Stack direction="row" spacing={0.75} useFlexGap sx={{ flexWrap: 'wrap' }}>
-            {step.resources.map((resource) => {
-              const internal = resource.href.startsWith('/')
-              return (
-                <Link
-                  key={resource.href}
-                  component={internal ? RouterLink : 'a'}
-                  to={internal ? resource.href : undefined}
-                  href={internal ? undefined : resource.href}
-                  target={internal ? undefined : '_blank'}
-                  rel={internal ? undefined : 'noreferrer'}
-                  variant="caption"
-                  underline="hover"
-                >
-                  {resource.label}
-                </Link>
-              )
-            })}
-          </Stack>
-        </Box>
-      ) : null}
-
-      {step.nextTask ? (
-        <Button
-          component={RouterLink}
-          to={step.nextTask.to}
-          variant={isFocus ? 'contained' : 'outlined'}
-          color={isFocus ? 'secondary' : 'primary'}
-          size="small"
-          endIcon={<ChevronRight />}
-        >
-          {step.nextTask.cta}
-        </Button>
-      ) : (
-        <Button component={RouterLink} to={step.resources[0]?.href ?? '/dashboard'} size="small" color="success">
-          Review this step
-        </Button>
-      )}
     </Box>
   )
 }
 
 function TaskRow({ task, isNext }: { task: ProcessTask; isNext: boolean }) {
+  const warning = !task.done && (Boolean(task.inProgress) || isNext)
+  const actionLabel = task.done ? `Review ${task.label}` : task.cta
+
   return (
-    <Stack
-      direction="row"
-      spacing={1}
-      component={RouterLink}
-      to={task.to}
-      sx={{
-        alignItems: 'flex-start',
-        textDecoration: 'none',
-        color: 'inherit',
-        p: 0.75,
-        ml: -0.75,
-        borderRadius: 1,
-        bgcolor: isNext && !task.done ? '#FDECEC' : 'transparent',
-        '&:hover': { bgcolor: isNext && !task.done ? '#F8D4D4' : '#F5F7FB' },
-      }}
-    >
-      {task.done ? (
-        <CheckCircle sx={{ fontSize: 18, color: '#1B7A4E', mt: '1px' }} />
-      ) : (
-        <RadioButtonUnchecked
-          sx={{ fontSize: 18, color: isNext ? 'secondary.main' : 'text.secondary', mt: '1px' }}
-        />
-      )}
-      <Box sx={{ minWidth: 0 }}>
-        <Typography
-          variant="body2"
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'flex-start' }}>
+      <Stack
+        direction="row"
+        spacing={1}
+        component={RouterLink}
+        to={task.to}
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          alignItems: 'flex-start',
+          textDecoration: 'none',
+          color: 'inherit',
+          p: 0.75,
+          ml: -0.75,
+          borderRadius: 1,
+          bgcolor: warning ? '#FDECEC' : 'transparent',
+          '&:hover': { bgcolor: warning ? '#F8D4D4' : '#F5F7FB' },
+        }}
+      >
+        {task.done ? (
+          <CheckCircle sx={{ fontSize: 18, color: '#1B7A4E', mt: '1px' }} />
+        ) : warning ? (
+          <WarningAmber sx={{ fontSize: 18, color: '#C47B17', mt: '1px' }} />
+        ) : (
+          <ErrorOutline sx={{ fontSize: 18, color: 'secondary.main', mt: '1px' }} />
+        )}
+        <Box sx={{ minWidth: 0 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: warning ? 700 : 500,
+              textDecoration: task.done ? 'line-through' : 'none',
+              color: task.done ? 'text.secondary' : 'text.primary',
+            }}
+          >
+            {task.label}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {task.hint}
+          </Typography>
+        </Box>
+      </Stack>
+      <Tooltip title={actionLabel}>
+        <IconButton
+          component={RouterLink}
+          to={task.to}
+          size="small"
+          aria-label={actionLabel}
           sx={{
-            fontWeight: isNext && !task.done ? 700 : 500,
-            textDecoration: task.done ? 'line-through' : 'none',
-            color: task.done ? 'text.secondary' : 'text.primary',
+            mt: 0.15,
+            width: 32,
+            height: 32,
+            bgcolor: task.done ? 'primary.main' : 'secondary.main',
+            color: 'white',
+            '&:hover': {
+              bgcolor: task.done ? 'primary.dark' : 'secondary.dark',
+            },
           }}
         >
-          {task.label}
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          {task.hint}
-        </Typography>
-      </Box>
+          <PlayArrow sx={{ fontSize: 20 }} />
+        </IconButton>
+      </Tooltip>
     </Stack>
   )
 }

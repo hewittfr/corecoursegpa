@@ -74,9 +74,139 @@ const theme = createTheme({
       },
     },
     MuiButton: {
+      defaultProps: {
+        size: 'small',
+      },
       styleOverrides: {
         root: {
           borderRadius: 6,
+        },
+      },
+    },
+    MuiButtonGroup: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiIconButton: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiTextField: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiFormControl: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiInputBase: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiInputLabel: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiOutlinedInput: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiFilledInput: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiInput: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiSelect: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiAutocomplete: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiChip: {
+      defaultProps: {
+        size: 'small',
+      },
+      styleOverrides: {
+        root: {
+          fontWeight: 600,
+        },
+      },
+    },
+    MuiCheckbox: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiRadio: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiSwitch: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiTable: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiTableCell: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiFab: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiToggleButton: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiToggleButtonGroup: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiPagination: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiRating: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiSlider: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+    MuiAlert: {
+      styleOverrides: {
+        standard: {
+          backgroundColor: banner,
         },
       },
     },
@@ -84,20 +214,6 @@ const theme = createTheme({
       styleOverrides: {
         colorInherit: {
           backgroundColor: '#ffffff',
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          fontWeight: 600,
-        },
-      },
-    },
-    MuiAlert: {
-      styleOverrides: {
-        standard: {
-          backgroundColor: banner,
         },
       },
     },

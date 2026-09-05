@@ -9,11 +9,7 @@ export interface ProcessTask {
   cta: string
   to: string
   done: boolean
-}
-
-export interface ProcessResource {
-  label: string
-  href: string
+  inProgress?: boolean
 }
 
 export interface ProcessStep {
@@ -21,8 +17,9 @@ export interface ProcessStep {
   title: string
   goal: string
   why: string
+  reviewTo: string
+  reviewCta: string
   tasks: ProcessTask[]
-  resources: ProcessResource[]
   completed: number
   total: number
   percent: number
@@ -40,6 +37,10 @@ function trainingDone(topics: TrainingTopic[], id: string): boolean {
   return topics.find((topic) => topic.id === id)?.status === 'Complete'
 }
 
+function trainingInProgress(topics: TrainingTopic[], id: string): boolean {
+  return topics.find((topic) => topic.id === id)?.status === 'In Progress'
+}
+
 function trainingPath(id: string): string {
   return `/training?topic=${id}`
 }
@@ -55,8 +56,9 @@ function toStep(
   title: string,
   goal: string,
   why: string,
+  reviewTo: string,
+  reviewCta: string,
   tasks: ProcessTask[],
-  resources: ProcessResource[] = [],
 ): ProcessStep {
   const completed = tasks.filter((task) => task.done).length
   const total = tasks.length
@@ -66,8 +68,9 @@ function toStep(
     title,
     goal,
     why,
+    reviewTo,
+    reviewCta,
     tasks,
-    resources,
     completed,
     total,
     percent,
@@ -99,6 +102,8 @@ export function buildRecruitingProcess(
       'Academic eligibility',
       'Prove you can qualify — then keep the tracker current.',
       'Coaches look at eligibility first. Finish this step before outreach so they know you are on track.',
+      '/eligibility',
+      'Review eligibility',
       [
         {
           id: 'eligibility-video',
@@ -151,19 +156,14 @@ export function buildRecruitingProcess(
           done: trainingDone(topics, 'trn-021'),
         },
       ],
-      [
-        { label: 'Eligibility status report', href: '/eligibility' },
-        {
-          label: 'Approved NCAA core courses',
-          href: 'https://web3.ncaa.org/hsportal/exec/hsAction',
-        },
-      ],
     ),
     toStep(
       2,
       'Recruiting profile',
       'Build a one-page digital resume coaches can scan in under a minute.',
       'Do this after eligibility is in motion. Coaches need a photo, numbers, honors, and film — not a long bio.',
+      '/recruiting/profile',
+      'View profile',
       [
         {
           id: 'profile-video',
@@ -172,6 +172,7 @@ export function buildRecruitingProcess(
           cta: 'Watch video',
           to: trainingPath('trn-003'),
           done: trainingDone(topics, 'trn-003'),
+          inProgress: trainingInProgress(topics, 'trn-003'),
         },
         {
           id: 'profile-basics',
@@ -198,13 +199,14 @@ export function buildRecruitingProcess(
           done: hasFilm,
         },
       ],
-      [{ label: 'View your profile', href: '/recruiting/profile' }],
     ),
     toStep(
       3,
       'Outreach & research',
       'Find schools that fit, then contact coaches the right way.',
       'Wait until Steps 1 and 2 are moving. A coach email without eligibility or film usually gets deleted.',
+      '/coaches',
+      'Open coach search',
       [
         {
           id: 'outreach-video',
@@ -213,6 +215,7 @@ export function buildRecruitingProcess(
           cta: 'Watch video',
           to: trainingPath('trn-004'),
           done: trainingDone(topics, 'trn-004'),
+          inProgress: trainingInProgress(topics, 'trn-004'),
         },
         {
           id: 'coach-search',
@@ -241,13 +244,6 @@ export function buildRecruitingProcess(
           to: '/recruiting/targets',
           done: hasTargets,
         },
-      ],
-      [
-        { label: 'NCAA DI schools', href: 'https://www.ncaa.com/schools-index' },
-        { label: 'NCAA members by sport', href: 'https://web3.ncaa.org/directory/memberList?type=1' },
-        { label: 'NAIA members', href: 'https://www.naia.org' },
-        { label: 'NJCAA members', href: 'https://www.njcaa.org' },
-        { label: 'BigFuture college search', href: 'https://bigfuture.collegeboard.org/college-search' },
       ],
     ),
   ]

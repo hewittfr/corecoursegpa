@@ -140,7 +140,7 @@ export const communicationWhen: GuideCard[] = [
     body: 'A short DM is a tap on the shoulder, not the whole conversation. Use it after they already know you, or when a coach is active on that platform.',
     bullets: [
       'After they viewed your Hudl or replied to an email.',
-      'The night before a camp: “See you at 8 a.m. check-in — Jude Hewitt, 2028 QB.”',
+      'The night before a camp: “See you at 8 a.m. check-in — Alexander Caldwell, 2028 QB.”',
       'A 15-second clip from last Friday, with the full film still in email.',
       'Do not start with “Hey coach watch this” and no name, class year, or school.',
     ],
@@ -159,7 +159,7 @@ export const communicationWhen: GuideCard[] = [
     body: 'If it is only in your head, you will double-send or ghost a school you like.',
     bullets: [
       'Use Coach Search in this app as the live tracker: school, coach, last email, reply, and next step.',
-      'One email folder per school. Subject lines like “Jude Hewitt 2028 QB — Thomas Jefferson (Tampa) — updated film.”',
+      'One email folder per school. Subject lines like “Alexander Caldwell 2028 QB — Thomas Jefferson (Tampa) — updated film.”',
       'A simple sheet with columns: school, division, coach email, last contact, response, visit, offer, notes.',
       'Share the sheet with a parent so someone else can see who is waiting on you.',
       'After every camp or call, write three bullets the same day: who you met, what they asked, what you promised to send.',
@@ -172,11 +172,11 @@ export const sampleMessages: SampleMessage[] = [
     title: 'First introduction',
     channel: 'Email',
     when: 'Sophomore spring or junior fall, once film and a GPA are ready.',
-    body: `Subject: Jude Hewitt — 2028 QB — Thomas Jefferson HS (Tampa, FL)
+    body: `Subject: Alexander Caldwell — 2028 QB — Thomas Jefferson HS (Tampa, FL)
 
 Coach LastName,
 
-My name is Jude Hewitt. I am a 2028 quarterback at Thomas Jefferson High School in Tampa, Florida.
+My name is Alexander Caldwell. I am a 2028 quarterback at Thomas Jefferson High School in Tampa, Florida.
 
 I am 5'6" and 155 lbs, Class of 2028, and I am building my NCAA core-course file (current DI core GPA 3.883). I would like to learn more about your program and whether I could be a fit.
 
@@ -185,7 +185,7 @@ Upcoming: [next game or camp date]
 
 Thank you for your time. I would be glad to send a transcript or full-game film.
 
-Jude Hewitt
+Alexander Caldwell
 2028 QB | Thomas Jefferson HS
 [phone] | [email]`,
   },
@@ -193,7 +193,7 @@ Jude Hewitt
     title: 'Follow-up with new film',
     channel: 'Email',
     when: '10–14 days after the first note, or right after a new game is uploaded.',
-    body: `Subject: Jude Hewitt 2028 QB — updated Week 3 film
+    body: `Subject: Alexander Caldwell 2028 QB — updated Week 3 film
 
 Coach LastName,
 
@@ -204,13 +204,13 @@ Next game: Friday, [date] vs [opponent]
 
 Please let me know if you would like a transcript or to see me at a camp this spring.
 
-Jude Hewitt`,
+Alexander Caldwell`,
   },
   {
     title: 'Thank-you after a camp',
     channel: 'Email',
     when: 'The night of the camp or the next morning.',
-    body: `Subject: Thank you — Jude Hewitt 2028 QB, Saturday camp
+    body: `Subject: Thank you — Alexander Caldwell 2028 QB, Saturday camp
 
 Coach LastName,
 
@@ -220,19 +220,19 @@ I am a 2028 QB at Thomas Jefferson in Tampa. If it is helpful, here is my update
 
 I would like to stay in touch and visit campus again this fall if that is allowed.
 
-Jude Hewitt`,
+Alexander Caldwell`,
   },
   {
     title: 'Short first DM',
     channel: 'DM',
     when: 'Only if the coach is clearly active on that account, or after they have your email.',
-    body: `Coach LastName — Jude Hewitt, 2028 QB, Thomas Jefferson (Tampa). Just emailed my film and GPA. Happy to send the full game if useful. Thank you.`,
+    body: `Coach LastName — Alexander Caldwell, 2028 QB, Thomas Jefferson (Tampa). Just emailed my film and GPA. Happy to send the full game if useful. Thank you.`,
   },
   {
     title: 'Day-before-camp DM',
     channel: 'DM',
     when: 'After you are registered and they already have your name.',
-    body: `Coach — Jude Hewitt 2028 QB, registered for tomorrow’s 8 a.m. camp. See you at check-in.`,
+    body: `Coach — Alexander Caldwell 2028 QB, registered for tomorrow’s 8 a.m. camp. See you at check-in.`,
   },
 ]
 

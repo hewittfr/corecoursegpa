@@ -46,10 +46,10 @@ const navItems: {
     icon: <SportsOutlined />,
     children: [
       { label: 'Calendar', path: '/recruiting/calendar', icon: <CalendarMonthOutlined /> },
+      { label: 'Coach Search', path: '/coaches', icon: <SearchOutlined /> },
     ],
   },
   { label: 'Training Library', path: '/training', icon: <LibraryBooksOutlined /> },
-  { label: 'Coach Search', path: '/coaches', icon: <SearchOutlined /> },
 ]
 
 export default function AppLayout() {

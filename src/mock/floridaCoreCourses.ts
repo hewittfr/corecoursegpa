@@ -1,0 +1,116 @@
+import type { CourseSubject } from '../types'
+
+export interface FloridaCoreCourseOption {
+  name: string
+  subject: CourseSubject
+}
+
+function courses(subject: CourseSubject, names: string[]): FloridaCoreCourseOption[] {
+  return names.map((name) => ({ name, subject }))
+}
+
+export const FLORIDA_CORE_COURSES: FloridaCoreCourseOption[] = [
+  ...courses('English', [
+    'English 1',
+    'English 1 Honors',
+    'English 2',
+    'English 2 Honors',
+    'English 3',
+    'English 3 Honors',
+    'English 4',
+    'English 4 Honors',
+    'American Literature',
+    'British Literature',
+    'Advanced Placement English Language and Composition',
+    'Advanced Placement English Literature and Composition',
+    'Dual Enrollment English Composition 1',
+    'Dual Enrollment English Composition 2',
+  ]),
+  ...courses('Math', [
+    'Algebra 1',
+    'Algebra 1 Honors',
+    'Algebra 2',
+    'Algebra 2 Honors',
+    'Geometry',
+    'Geometry Honors',
+    'Pre-Calculus Honors',
+    'Calculus Honors',
+    'Trigonometry',
+    'Probability and Statistics with Applications Honors',
+    'Mathematics for College Algebra',
+    'Advanced Placement Precalculus',
+    'Advanced Placement Calculus AB',
+    'Advanced Placement Calculus BC',
+    'Advanced Placement Statistics',
+  ]),
+  ...courses('Science', [
+    'Biology 1',
+    'Biology 1 Honors',
+    'Chemistry 1',
+    'Chemistry 1 Honors',
+    'Physics 1',
+    'Physics 1 Honors',
+    'Anatomy and Physiology',
+    'Anatomy and Physiology Honors',
+    'Earth Space Science',
+    'Earth Space Science Honors',
+    'Environmental Science',
+    'Marine Science 1 Honors',
+    'Physical Science',
+    'Advanced Placement Biology',
+    'Advanced Placement Chemistry',
+    'Advanced Placement Physics 1',
+    'Advanced Placement Physics 2',
+    'Advanced Placement Physics C: Mechanics',
+    'Advanced Placement Environmental Science',
+  ]),
+  ...courses('Social Science', [
+    'World History',
+    'World History Honors',
+    'United States History',
+    'United States History Honors',
+    'United States Government',
+    'United States Government Honors',
+    'Economics with Financial Literacy',
+    'Economics with Financial Literacy Honors',
+    'Psychology 1',
+    'Sociology',
+    'Advanced Placement World History: Modern',
+    'Advanced Placement United States History',
+    'Advanced Placement United States Government and Politics',
+    'Advanced Placement Human Geography',
+    'Advanced Placement European History',
+    'Advanced Placement Macroeconomics',
+    'Advanced Placement Microeconomics',
+    'Advanced Placement Psychology',
+  ]),
+  ...courses('Additional Core', [
+    'Spanish 1',
+    'Spanish 2',
+    'Spanish 3',
+    'Spanish 4',
+    'Spanish 1 Honors',
+    'Spanish 2 Honors',
+    'Spanish 3 Honors',
+    'French 1',
+    'French 2',
+    'French 3',
+    'French 4',
+    'American Sign Language 1',
+    'American Sign Language 2',
+    'American Sign Language 3',
+    'Latin 1',
+    'Latin 2',
+    'German 1',
+    'German 2',
+    'Chinese 1',
+    'Chinese 2',
+    'Advanced Placement Spanish Language and Culture',
+    'Advanced Placement Spanish Literature and Culture',
+    'Advanced Placement French Language and Culture',
+  ]),
+]
+
+export function floridaCourseByName(name: string): FloridaCoreCourseOption | undefined {
+  return FLORIDA_CORE_COURSES.find((course) => course.name === name)
+}

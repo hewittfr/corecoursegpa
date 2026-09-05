@@ -1,12 +1,19 @@
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined'
+import CheckCircle from '@mui/icons-material/CheckCircle'
+import ChecklistOutlined from '@mui/icons-material/ChecklistOutlined'
+import EventAvailableOutlined from '@mui/icons-material/EventAvailableOutlined'
 import FactCheckOutlined from '@mui/icons-material/FactCheckOutlined'
-import FitnessCenterOutlined from '@mui/icons-material/FitnessCenterOutlined'
+import FlagOutlined from '@mui/icons-material/FlagOutlined'
+import HourglassEmpty from '@mui/icons-material/HourglassEmpty'
 import LibraryBooksOutlined from '@mui/icons-material/LibraryBooksOutlined'
+import MailOutlined from '@mui/icons-material/MailOutlined'
 import PersonOutlined from '@mui/icons-material/PersonOutlined'
+import QuizOutlined from '@mui/icons-material/QuizOutlined'
+import RadioButtonUnchecked from '@mui/icons-material/RadioButtonUnchecked'
 import SchoolOutlined from '@mui/icons-material/SchoolOutlined'
 import SportsFootballOutlined from '@mui/icons-material/SportsFootballOutlined'
+import VideocamOutlined from '@mui/icons-material/VideocamOutlined'
 import {
-  Box,
   Button,
   Card,
   CardContent,
@@ -15,6 +22,8 @@ import {
   LinearProgress,
   List,
   ListItem,
+  ListItemButton,
+  ListItemIcon,
   ListItemText,
   Stack,
   Typography,
@@ -22,11 +31,23 @@ import {
 import { Link as RouterLink } from 'react-router-dom'
 import { useAppSelector } from '../../app/hooks'
 import EligibilityGauge from '../../components/EligibilityGauge'
-import EligibilityTable from '../../components/EligibilityTable'
 import PositionFitPreview from '../../components/PositionFitPreview'
 import RecruitingProcessGuide from '../../components/RecruitingProcessGuide'
 import { mockCalendarEvents, mockTrainingTopics } from '../../mock/data'
+import type { CalendarEventType, TrainingStatus, TrainingTopic } from '../../types'
 import { creditProgress, formatDateRange, fullName, locationLine, primarySport, schoolLine } from '../../utils/format'
+
+const TRAINING_STATUS_STYLE: Record<TrainingStatus, { bgcolor: string; color: string }> = {
+  Complete: { bgcolor: '#1B7A4E', color: '#ffffff' },
+  'In Progress': { bgcolor: '#C47B17', color: '#ffffff' },
+  'Not Started': { bgcolor: '#E6EEFF', color: '#222A5B' },
+}
+
+const TRAINING_STATUS_ICON: Record<TrainingStatus, typeof CheckCircle> = {
+  Complete: CheckCircle,
+  'In Progress': HourglassEmpty,
+  'Not Started': RadioButtonUnchecked,
+}
 
 export default function StudentDashboard() {
   const student = useAppSelector((state) => state.student.current)
@@ -41,8 +62,8 @@ export default function StudentDashboard() {
         (item.sport === 'All' || item.sport === primarySportName),
     )
     .sort((a, b) => a.startDate.localeCompare(b.startDate))
-    .slice(0, 4)
-  const featuredTraining = mockTrainingTopics.filter((topic) => topic.featured).slice(0, 3)
+    .slice(0, 7)
+  const featuredTraining = mockTrainingTopics.filter((topic) => topic.featured)
 
   return (
     <Stack spacing={3}>
@@ -142,156 +163,137 @@ export default function StudentDashboard() {
 
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, lg: 7 }}>
-          <Card>
+          <Card sx={{ height: '100%' }}>
             <CardContent>
               <Stack
                 direction="row"
-                sx={{ mb: 2, justifyContent: 'space-between', alignItems: 'center' }}
+                spacing={1}
+                sx={{ mb: 0.5, justifyContent: 'space-between', alignItems: 'center' }}
               >
-                <Typography variant="h6">Eligibility snapshot</Typography>
-                <Button component={RouterLink} to="/eligibility" color="secondary">
-                  Full report
+                <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                  <LibraryBooksOutlined color="secondary" />
+                  <Typography variant="h6">Training materials</Typography>
+                </Stack>
+                <Button component={RouterLink} to="/training" color="secondary" startIcon={<FactCheckOutlined />}>
+                  Open library
                 </Button>
               </Stack>
-              <EligibilityTable eligibility={student.eligibility} compact />
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Watch these in the same order as the 3-step process. Open a topic to continue where you left off.
+              </Typography>
+              <List dense disablePadding>
+                {featuredTraining.map((topic) => {
+                  const Icon = TRAINING_STATUS_ICON[topic.status]
+                  const style = TRAINING_STATUS_STYLE[topic.status]
+                  return (
+                    <ListItem key={topic.id} disablePadding>
+                      <ListItemButton
+                        component={RouterLink}
+                        to={`/training?topic=${topic.id}`}
+                        sx={{ borderRadius: 1, py: 0.75 }}
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          {trainingIcon(topic)}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={topic.title}
+                          secondary={
+                            topic.duration ? `${topic.category} · ${topic.duration}` : topic.category
+                          }
+                        />
+                        <Chip
+                          size="small"
+                          icon={<Icon sx={{ color: `${style.color} !important`, fontSize: 16 }} />}
+                          label={topic.status}
+                          sx={{ ...style, fontWeight: 700, ml: 1 }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  )
+                })}
+              </List>
             </CardContent>
           </Card>
         </Grid>
         <Grid size={{ xs: 12, lg: 5 }}>
-          <Stack spacing={2}>
-            <Card>
-              <CardContent>
-                <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{ mb: 0.5, justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                   <CalendarMonthOutlined color="primary" />
-                  <Typography variant="h6">Upcoming dates</Typography>
+                  <Typography variant="h6">Important Upcoming Dates</Typography>
                 </Stack>
-                <List dense>
-                  {upcoming.map((event) => (
-                    <ListItem key={event.id} disableGutters>
-                      <ListItemText
-                        primary={event.title}
-                        secondary={`${event.type} · ${formatDateRange(event.startDate, event.endDate)}`}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-                <Button component={RouterLink} to="/recruiting/calendar">
-                  Open training calendar
+                <Button
+                  component={RouterLink}
+                  to="/recruiting/calendar"
+                  color="secondary"
+                  startIcon={<CalendarMonthOutlined />}
+                >
+                  Open Calendar
                 </Button>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent>
-                <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
-                  <LibraryBooksOutlined color="secondary" />
-                  <Typography variant="h6">Training materials</Typography>
-                </Stack>
-                <List dense>
-                  {featuredTraining.map((topic) => (
-                    <ListItem key={topic.id} disableGutters>
-                      <ListItemText
-                        primary={topic.title}
-                        secondary={topic.duration ? `${topic.category} · ${topic.duration}` : topic.category}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-                <Stack direction="row" spacing={1}>
-                  <Button component={RouterLink} to="/training" startIcon={<FactCheckOutlined />}>
-                    Library
-                  </Button>
-                  <Button component={RouterLink} to="/recruiting" startIcon={<PersonOutlined />} color="secondary">
-                    Recruiting dashboard
-                  </Button>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Stack>
+              </Stack>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Test dates, deadlines, and other dates that matter for {primarySportName ?? 'your sport'}.
+              </Typography>
+              <List dense disablePadding>
+                {upcoming.map((event) => (
+                  <ListItem key={event.id} disableGutters sx={{ py: 0.75 }}>
+                    <ListItemIcon sx={{ minWidth: 36 }}>
+                      {dateIcon(event.type)}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={event.title}
+                      secondary={`${event.type} · ${formatDateRange(event.startDate, event.endDate)}`}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
 
-      <Box>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Training calendars, resources, and position standards
-        </Typography>
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
-                  <CalendarMonthOutlined color="primary" />
-                  <Typography variant="h6">Training calendar</Typography>
-                </Stack>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                  NCAA recruiting windows, SAT/ACT dates, and other dates that matter for{' '}
-                  {primarySportName ?? 'your sport'}.
-                </Typography>
-                <List dense>
-                  {upcoming.slice(0, 3).map((event) => (
-                    <ListItem key={`tool-${event.id}`} disableGutters>
-                      <ListItemText
-                        primary={event.title}
-                        secondary={formatDateRange(event.startDate, event.endDate)}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-                <Button component={RouterLink} to="/recruiting/calendar" color="secondary">
-                  Open calendar
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
-                  <LibraryBooksOutlined color="secondary" />
-                  <Typography variant="h6">Training resources</Typography>
-                </Stack>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                  Eligibility, outreach, and process videos from the training library.
-                </Typography>
-                <List dense>
-                  {featuredTraining.map((topic) => (
-                    <ListItem key={`tool-${topic.id}`} disableGutters>
-                      <ListItemText primary={topic.title} secondary={topic.duration} />
-                    </ListItem>
-                  ))}
-                </List>
-                <Button component={RouterLink} to="/training" startIcon={<FactCheckOutlined />}>
-                  Open library
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
-                  <FitnessCenterOutlined color="secondary" />
-                  <Typography variant="h6">Position requirements</Typography>
-                </Stack>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                  Height, weight, 40 time, and other combine metrics by division for{' '}
-                  {primarySport(student)}.
-                </Typography>
-                <Button component={RouterLink} to="/recruiting/positions" color="secondary">
-                  View {primarySportName ?? 'sport'} standards
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-        <PositionFitPreview
-          sport={primarySportName ?? 'Football'}
-          position={student.sports.find((item) => item.primary)?.positions[0] ?? 'Quarterback'}
-          profile={student.profile}
-          compact
-        />
-      </Box>
+      <PositionFitPreview
+        sport={primarySportName ?? 'Football'}
+        position={student.sports.find((item) => item.primary)?.positions[0] ?? 'Quarterback'}
+        profile={student.profile}
+        compact
+      />
     </Stack>
   )
+}
+
+function trainingIcon(topic: TrainingTopic) {
+  if (topic.category === 'Calendars') {
+    return <CalendarMonthOutlined color="primary" fontSize="small" />
+  }
+  if (topic.category === 'Outreach') {
+    return <MailOutlined color="secondary" fontSize="small" />
+  }
+  if (topic.category === 'Recruiting Profile') {
+    return <PersonOutlined color="primary" fontSize="small" />
+  }
+  if (/checklist/i.test(topic.title)) {
+    return <ChecklistOutlined color="primary" fontSize="small" />
+  }
+  if (topic.duration || /video|webinar/i.test(topic.title)) {
+    return <VideocamOutlined color="secondary" fontSize="small" />
+  }
+  return <SchoolOutlined color="primary" fontSize="small" />
+}
+
+function dateIcon(type: CalendarEventType) {
+  if (type === 'Test Date') {
+    return <QuizOutlined color="primary" fontSize="small" />
+  }
+  if (type === 'Deadline') {
+    return <FlagOutlined color="secondary" fontSize="small" />
+  }
+  return <EventAvailableOutlined color="primary" fontSize="small" />
 }
 
 function SummaryCard({

@@ -9,7 +9,7 @@ export { mockCalendarEvents } from './calendarEvents'
 export { mockColleges } from './targetSchools'
 
 export const DEMO_CREDENTIALS = {
-  email: 'jude.hewitt@demo.edu',
+  email: 'alexander.caldwell@demo.edu',
   password: 'Recruit2028!',
 }
 
@@ -18,13 +18,13 @@ export const mockAuthUser: AuthUser = {
   email: DEMO_CREDENTIALS.email,
   role: 'student',
   studentId: 'stu-001',
-  displayName: 'Jude Hewitt',
+  displayName: 'Alexander Caldwell',
 }
 
 export const mockStudent: Student = {
   id: 'stu-001',
-  firstName: 'Jude',
-  lastName: 'Hewitt',
+  firstName: 'Alexander',
+  lastName: 'Caldwell',
   email: DEMO_CREDENTIALS.email,
   graduationYear: 2028,
   ncaaId: '',
@@ -45,24 +45,24 @@ export const mockStudent: Student = {
     },
   ],
   courses: [
-    { id: 'crs-001', year: '2024-25', semester: 'Fall', courseName: 'English 9', letterGrade: 'A', points: 0.5 },
-    { id: 'crs-002', year: '2024-25', semester: 'Spring', courseName: 'English 9', letterGrade: 'A', points: 0.5 },
-    { id: 'crs-003', year: '2024-25', semester: 'Fall', courseName: 'Algebra I', letterGrade: 'A', points: 0.5 },
-    { id: 'crs-004', year: '2024-25', semester: 'Spring', courseName: 'Algebra I', letterGrade: 'A', points: 0.5 },
-    { id: 'crs-005', year: '2024-25', semester: 'Full Year', courseName: 'Biology', letterGrade: 'A', points: 1 },
-    { id: 'crs-006', year: '2024-25', semester: 'Full Year', courseName: 'Spanish I', letterGrade: 'A', points: 1 },
-    { id: 'crs-007', year: '2025-26', semester: 'Fall', courseName: 'English 10', letterGrade: 'A', points: 0.5 },
-    { id: 'crs-008', year: '2025-26', semester: 'Spring', courseName: 'English 10', letterGrade: 'A', points: 0.5 },
+    { id: 'crs-001', year: '2024-25', semester: 'Fall', courseName: 'English 1', letterGrade: 'A', points: 0.5 },
+    { id: 'crs-002', year: '2024-25', semester: 'Spring', courseName: 'English 1', letterGrade: 'A', points: 0.5 },
+    { id: 'crs-003', year: '2024-25', semester: 'Fall', courseName: 'Algebra 1', letterGrade: 'A', points: 0.5 },
+    { id: 'crs-004', year: '2024-25', semester: 'Spring', courseName: 'Algebra 1', letterGrade: 'A', points: 0.5 },
+    { id: 'crs-005', year: '2024-25', semester: 'Full Year', courseName: 'Biology 1', letterGrade: 'A', points: 1 },
+    { id: 'crs-006', year: '2024-25', semester: 'Full Year', courseName: 'Spanish 1', letterGrade: 'A', points: 1 },
+    { id: 'crs-007', year: '2025-26', semester: 'Fall', courseName: 'English 2', letterGrade: 'A', points: 0.5 },
+    { id: 'crs-008', year: '2025-26', semester: 'Spring', courseName: 'English 2', letterGrade: 'A', points: 0.5 },
     { id: 'crs-009', year: '2025-26', semester: 'Full Year', courseName: 'Geometry', letterGrade: 'A', points: 1 },
-    { id: 'crs-010', year: '2025-26', semester: 'Full Year', courseName: 'Chemistry', letterGrade: 'A', points: 1 },
+    { id: 'crs-010', year: '2025-26', semester: 'Full Year', courseName: 'Chemistry 1', letterGrade: 'A', points: 1 },
     { id: 'crs-011', year: '2025-26', semester: 'Full Year', courseName: 'World History', letterGrade: 'A', points: 1 },
-    { id: 'crs-012', year: '2025-26', semester: 'Full Year', courseName: 'Spanish II', letterGrade: 'B', points: 1 },
-    { id: 'crs-013', year: '2026-27', semester: 'Fall', courseName: 'English 11', letterGrade: 'A', points: 0.5 },
-    { id: 'crs-014', year: '2026-27', semester: 'Spring', courseName: 'English 11', letterGrade: 'A', points: 0.5 },
-    { id: 'crs-015', year: '2026-27', semester: 'Full Year', courseName: 'Algebra II', letterGrade: 'B', points: 1 },
+    { id: 'crs-012', year: '2025-26', semester: 'Full Year', courseName: 'Spanish 2', letterGrade: 'B', points: 1 },
+    { id: 'crs-013', year: '2026-27', semester: 'Fall', courseName: 'English 3', letterGrade: 'A', points: 0.5 },
+    { id: 'crs-014', year: '2026-27', semester: 'Spring', courseName: 'English 3', letterGrade: 'A', points: 0.5 },
+    { id: 'crs-015', year: '2026-27', semester: 'Full Year', courseName: 'Algebra 2', letterGrade: 'B', points: 1 },
     { id: 'crs-016', year: '2026-27', semester: 'Full Year', courseName: 'United States History', letterGrade: 'A', points: 1 },
-    { id: 'crs-017', year: '2026-27', semester: 'Fall', courseName: 'Physics', letterGrade: '', points: 0.5 },
-    { id: 'crs-018', year: '2027-28', semester: 'Fall', courseName: 'American Government', letterGrade: '', points: 0.5 },
+    { id: 'crs-017', year: '2026-27', semester: 'Fall', courseName: 'Physics 1', letterGrade: '', points: 0.5 },
+    { id: 'crs-018', year: '2027-28', semester: 'Fall', courseName: 'United States Government', letterGrade: '', points: 0.5 },
   ],
   testScores: [],
   eligibility: {

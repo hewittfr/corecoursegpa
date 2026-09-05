@@ -1123,3 +1123,145 @@ export function previewMetrics(requirement: PositionRequirement): DivisionMetric
     metric.id === 'height' || metric.id === 'weight' || metric.id === 'forty' || metric.id === 'vertical',
   )
 }
+
+const PREVIEW_DIVISION_COLUMNS: { label: string; match: (division: string) => boolean }[] = [
+  {
+    label: 'D1',
+    match: (division) => division.includes('DI') && !division.includes('DII') && !division.includes('DIII'),
+  },
+  { label: 'D2', match: (division) => division.includes('DII') },
+  { label: 'D3', match: (division) => division.includes('DIII') },
+  { label: 'NAIA', match: (division) => division.includes('NAIA') },
+]
+
+export function previewDivisionColumns(
+  requirement: PositionRequirement,
+): { label: string; division: PositionDivisionTargets }[] {
+  return PREVIEW_DIVISION_COLUMNS.flatMap((column) => {
+    const division = requirement.divisions.find((item) => column.match(item.division))
+    return division ? [{ label: column.label, division }] : []
+  })
+}
+
+export function metricForDivision(
+  division: PositionDivisionTargets,
+  id: MetricId,
+): DivisionMetric | undefined {
+  return division.metrics.find((metric) => metric.id === id)
+}
+
+export type DivisionFitLabel = 'D1' | 'D2' | 'D3' | 'NAIA' | 'Below NAIA' | 'Not entered'
+
+const DIVISION_RANK: Record<Exclude<DivisionFitLabel, 'Not entered'>, number> = {
+  D1: 4,
+  D2: 3,
+  D3: 2,
+  NAIA: 1,
+  'Below NAIA': 0,
+}
+
+export function metricQualifies(value: number | null, metric: DivisionMetric): boolean {
+  const fit = compareMetric(value, metric)
+  return fit === 'in' || fit === 'above'
+}
+
+export function bestDivisionFitForMetric(
+  value: number | null,
+  metricId: MetricId,
+  columns: { label: string; division: PositionDivisionTargets }[],
+): { label: DivisionFitLabel; detail: string } {
+  if (value == null) {
+    return { label: 'Not entered', detail: 'Add this number to see a division fit.' }
+  }
+  for (const column of columns) {
+    const metric = metricForDivision(column.division, metricId)
+    if (!metric) continue
+    if (metricQualifies(value, metric)) {
+      const fit = compareMetric(value, metric)
+      return {
+        label: column.label as DivisionFitLabel,
+        detail: `${column.division.division} · ${fitChipLabel(fit, metric.better)}`,
+      }
+    }
+  }
+  return {
+    label: 'Below NAIA',
+    detail: 'Currently below the typical NAIA range for this metric.',
+  }
+}
+
+export interface MetricFitRecommendation {
+  headline: string
+  body: string
+  limiting: string[]
+}
+
+export function overallMetricRecommendation(
+  profile: RecruitingProfile,
+  metrics: DivisionMetric[],
+  columns: { label: string; division: PositionDivisionTargets }[],
+): MetricFitRecommendation {
+  const fits = metrics.map((metric) => ({
+    metric,
+    fit: bestDivisionFitForMetric(studentMetricValue(profile, metric.id), metric.id, columns),
+  }))
+  const entered = fits.filter((item) => item.fit.label !== 'Not entered')
+  if (entered.length === 0) {
+    return {
+      headline: 'Enter your measurables',
+      body: 'Add height, weight, and combine numbers to get a metrics-only division fit. Film, GPA, and production are not part of this recommendation.',
+      limiting: [],
+    }
+  }
+
+  const allQualifyAt = columns.find((column) =>
+    entered.every((item) => {
+      const metric = metricForDivision(column.division, item.metric.id)
+      return metric ? metricQualifies(studentMetricValue(profile, item.metric.id), metric) : false
+    }),
+  )
+  if (allQualifyAt) {
+    return {
+      headline: `${allQualifyAt.label} fit on these numbers`,
+      body: `Based on metrics alone, every listed number is in or above the typical ${allQualifyAt.label} range. Film, GPA, and production still decide offers.`,
+      limiting: [],
+    }
+  }
+
+  const counts = entered.reduce(
+    (acc, item) => {
+      acc[item.fit.label] = (acc[item.fit.label] ?? 0) + 1
+      return acc
+    },
+    {} as Partial<Record<DivisionFitLabel, number>>,
+  )
+  const closest = (Object.entries(counts) as [DivisionFitLabel, number][])
+    .filter(([label]) => label !== 'Not entered')
+    .sort((a, b) => {
+      if (b[1] !== a[1]) return b[1] - a[1]
+      return (DIVISION_RANK[b[0] as keyof typeof DIVISION_RANK] ?? 0) - (DIVISION_RANK[a[0] as keyof typeof DIVISION_RANK] ?? 0)
+    })[0]?.[0]
+
+  const limiting = entered
+    .filter((item) => item.fit.label === 'Below NAIA' || (closest && DIVISION_RANK[item.fit.label as keyof typeof DIVISION_RANK] < (DIVISION_RANK[closest as keyof typeof DIVISION_RANK] ?? 0)))
+    .map((item) => item.metric.label.toLowerCase())
+
+  if (closest === 'Below NAIA' || !closest) {
+    return {
+      headline: 'No current division size/speed fit',
+      body: 'Based on metrics alone, these numbers sit below typical NAIA ranges. Treat them as training targets. Film, GPA, and production are not included here.',
+      limiting,
+    }
+  }
+
+  const limitingText =
+    limiting.length > 0
+      ? ` ${limiting.join(' and ')} ${limiting.length === 1 ? 'is' : 'are'} currently below that level.`
+      : ''
+
+  return {
+    headline: `Closest overall: ${closest}`,
+    body: `Based on metrics alone, most of these numbers look like a ${closest} fit.${limitingText} Film, GPA, and production are not included in this recommendation.`,
+    limiting,
+  }
+}

@@ -165,7 +165,6 @@ export default function LoginPage() {
                       type="submit"
                       variant="contained"
                       color="secondary"
-                      size="large"
                       disabled={isSubmitting}
                     >
                       Member login
@@ -174,13 +173,12 @@ export default function LoginPage() {
                       type="button"
                       variant="contained"
                       color="primary"
-                      size="large"
                       onClick={() => {
                         dispatch(loginSuccess(authenticateDemo(DEMO_CREDENTIALS.email, DEMO_CREDENTIALS.password)!))
                         navigate('/dashboard')
                       }}
                     >
-                      Enter as Jude Hewitt
+                      Enter as Alexander Caldwell
                     </Button>
                   </Stack>
                 </Box>

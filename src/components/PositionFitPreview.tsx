@@ -1,4 +1,6 @@
 import {
+  Alert,
+  Box,
   Button,
   Card,
   CardContent,
@@ -9,23 +11,40 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import {
+  bestDivisionFitForMetric,
   compareMetric,
   findPositionRequirement,
   fitChipLabel,
   formatStudentMetric,
+  metricForDivision,
+  overallMetricRecommendation,
+  previewDivisionColumns,
   previewMetrics,
   studentMetricValue,
+  type DivisionFitLabel,
+  type FitLabel,
 } from '../mock/positionRequirements'
 import type { RecruitingProfile } from '../types'
 
-function fitColor(fit: ReturnType<typeof compareMetric>): 'default' | 'success' | 'warning' {
-  if (fit === 'in' || fit === 'above') return 'success'
-  if (fit === 'below') return 'warning'
-  return 'default'
+const FIT_COLOR: Record<FitLabel, string> = {
+  in: '#1B7A4E',
+  above: '#1B7A4E',
+  below: '#A52828',
+  none: '#5A6072',
+}
+
+const DIVISION_FIT_STYLE: Record<DivisionFitLabel, { bgcolor: string; color: string }> = {
+  D1: { bgcolor: '#222A5B', color: '#ffffff' },
+  D2: { bgcolor: '#3D467C', color: '#ffffff' },
+  D3: { bgcolor: '#C47B17', color: '#ffffff' },
+  NAIA: { bgcolor: '#3A4A86', color: '#ffffff' },
+  'Below NAIA': { bgcolor: '#A52828', color: '#ffffff' },
+  'Not entered': { bgcolor: '#E6EEFF', color: '#222A5B' },
 }
 
 interface PositionFitPreviewProps {
@@ -42,8 +61,9 @@ export default function PositionFitPreview({
   compact = false,
 }: PositionFitPreviewProps) {
   const requirement = findPositionRequirement(sport, position)
-  const topDivision = requirement.divisions[0]
   const metrics = previewMetrics(requirement)
+  const columns = previewDivisionColumns(requirement)
+  const recommendation = overallMetricRecommendation(profile, metrics, columns)
 
   return (
     <Card sx={{ height: '100%' }}>
@@ -58,38 +78,78 @@ export default function PositionFitPreview({
               {compact ? 'Position requirements' : `${requirement.sport} · ${requirement.position}`}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Typical {topDivision.division} ranges versus your profile.
+              Typical D1, D2, D3, and NAIA ranges versus your {requirement.position} profile.
             </Typography>
           </Stack>
           <Button component={RouterLink} to="/recruiting/positions" color="secondary" size="small">
-            All divisions
+            Full breakdown
           </Button>
         </Stack>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Metric</TableCell>
-              <TableCell align="right">You</TableCell>
-              <TableCell align="right">{topDivision.division}</TableCell>
-              <TableCell align="right">Fit</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {metrics.map((metric) => {
-              const fit = compareMetric(studentMetricValue(profile, metric.id), metric)
-              return (
-                <TableRow key={metric.id}>
-                  <TableCell>{metric.label}</TableCell>
-                  <TableCell align="right">{formatStudentMetric(profile, metric.id)}</TableCell>
-                  <TableCell align="right">{metric.typical}</TableCell>
-                  <TableCell align="right">
-                    <Chip size="small" color={fitColor(fit)} label={fitChipLabel(fit, metric.better)} />
+        <Box sx={{ overflowX: 'auto' }}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Metric</TableCell>
+                <TableCell align="right">You</TableCell>
+                {columns.map((column) => (
+                  <TableCell key={column.label} align="right">
+                    {column.label}
                   </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
+                ))}
+                <TableCell align="right">Your fit</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {metrics.map((metric) => {
+                const value = studentMetricValue(profile, metric.id)
+                const bestFit = bestDivisionFitForMetric(value, metric.id, columns)
+                return (
+                  <TableRow key={metric.id}>
+                    <TableCell>{metric.label}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>
+                      {formatStudentMetric(profile, metric.id)}
+                    </TableCell>
+                    {columns.map((column) => {
+                      const divisionMetric = metricForDivision(column.division, metric.id)
+                      if (!divisionMetric) {
+                        return (
+                          <TableCell key={column.label} align="right">
+                            —
+                          </TableCell>
+                        )
+                      }
+                      const fit = compareMetric(value, divisionMetric)
+                      return (
+                        <TableCell key={column.label} align="right" sx={{ whiteSpace: 'nowrap' }}>
+                          <Tooltip title={`${column.division.division}: ${fitChipLabel(fit, divisionMetric.better)}`}>
+                            <Typography variant="body2" sx={{ color: FIT_COLOR[fit], fontWeight: 600 }}>
+                              {divisionMetric.typical}
+                            </Typography>
+                          </Tooltip>
+                        </TableCell>
+                      )
+                    })}
+                    <TableCell align="right">
+                      <Tooltip title={bestFit.detail}>
+                        <Chip
+                          size="small"
+                          label={bestFit.label}
+                          sx={{ ...DIVISION_FIT_STYLE[bestFit.label], fontWeight: 700 }}
+                        />
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </Box>
+        <Alert severity="info" sx={{ mt: 2 }}>
+          <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+            {recommendation.headline}
+          </Typography>
+          <Typography variant="body2">{recommendation.body}</Typography>
+        </Alert>
       </CardContent>
     </Card>
   )
